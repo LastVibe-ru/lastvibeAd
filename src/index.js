@@ -24,6 +24,30 @@ client.on(Events.MessageCreate, async message => {
 
         await message.channel.send({ embeds: [embed], components: [row] });
     }
+
+    if (message.content === '!botInfo') {
+        const btnAds = new ButtonBuilder()
+            .setCustomId('addRoleAds')
+            .setLabel('📢')
+            .setStyle(ButtonStyle.Primary);
+
+        const btnEvents = new ButtonBuilder()
+            .setCustomId('addRoleEvents')
+            .setLabel('🎈')
+            .setStyle(ButtonStyle.Success);
+
+        const btnContent = new ButtonBuilder()
+            .setCustomId('addRoleContent')
+            .setLabel('🎥')
+            .setStyle(ButtonStyle.Danger);
+
+        const row = new ActionRowBuilder().addComponents(btnAds, btnContent, btnEvents);
+
+        const embed = new EmbedBuilder()
+            .setDescription('Нажмите на 📢, чтобы получать оповещения об объявлений от игроков.\n\nНажмите на 🎥, чтобы получать оповещения о контенте, видео и стримах от игроков.\n\nНажмите на 🎈, чтобы получать оповещения о ивентах от игроков.');
+
+        await message.channel.send({ embeds: [embed], components: [row] });
+    }
 });
 
 client.on(Events.InteractionCreate, async interaction => {
@@ -85,6 +109,57 @@ client.on(Events.InteractionCreate, async interaction => {
 
                 await adChannel.send({ embeds: [embed] });
                 await interaction.reply({ content: 'Ваше объявление было успешно отправлено!', ephemeral: true });
+            }
+        }
+
+        if (interaction.customId === 'addRoleAds') {
+            const member = interaction.member; // Используем interaction.member напрямую
+            const role = interaction.guild.roles.cache.find(r => r.name === 'advertisements');
+
+            if (role) { // Проверяем, существует ли роль
+                if (member.roles.cache.has(role.id)) { // Используем role.id
+                    await member.roles.remove(role).catch(console.error);
+                    await interaction.reply({ content: 'Роль убрана', ephemeral: true });
+                } else {
+                    await member.roles.add(role).catch(console.error);
+                    await interaction.reply({ content: 'Роль выдана', ephemeral: true });
+                }
+            } else {
+                await interaction.reply({ content: 'Ошибка, попробуйте позднее', ephemeral: true });
+            }
+        }
+
+        if (interaction.customId === 'addRoleEvents') {
+            const member = interaction.member;
+            const role = interaction.guild.roles.cache.find(r => r.name === 'events');
+
+            if (role) {
+                if (member.roles.cache.has(role.id)) {
+                    await member.roles.remove(role).catch(console.error);
+                    await interaction.reply({ content: 'Роль убрана', ephemeral: true });
+                } else {
+                    await member.roles.add(role).catch(console.error);
+                    await interaction.reply({ content: 'Роль выдана', ephemeral: true });
+                }
+            } else {
+                await interaction.reply({ content: 'Ошибка, попробуйте позднее', ephemeral: true });
+            }
+        }
+
+        if (interaction.customId === 'addRoleContent') {
+            const member = interaction.member;
+            const role = interaction.guild.roles.cache.find(r => r.name === 'contents');
+
+            if (role) {
+                if (member.roles.cache.has(role.id)) {
+                    await member.roles.remove(role).catch(console.error);
+                    await interaction.reply({content: 'Роль убрана', ephemeral: true});
+                } else {
+                    await member.roles.add(role).catch(console.error);
+                    await interaction.reply({content: 'Роль выдана', ephemeral: true});
+                }
+            } else {
+                await interaction.reply({content: 'Ошибка, попробуйте позднее', ephemeral: true});
             }
         }
     } catch (error) {
