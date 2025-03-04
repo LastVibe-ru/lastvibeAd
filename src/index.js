@@ -60,16 +60,19 @@ client.on(Events.InteractionCreate, async interaction => {
             const titleInput = new TextInputBuilder()
                 .setCustomId('title')
                 .setLabel('Заголовок')
+                .setPlaceholder('Открытие магазина...')
                 .setStyle(TextInputStyle.Short);
 
             const descriptionInput = new TextInputBuilder()
                 .setCustomId('description')
+                .setPlaceholder('Сегодня...')
                 .setLabel('Описание')
                 .setStyle(TextInputStyle.Paragraph);
 
             const urlInput = new TextInputBuilder()
                 .setCustomId('url')
                 .setLabel('Url картинки')
+                .setPlaceholder('https://media.discordapp.net/...')
                 .setRequired(false)
                 .setStyle(TextInputStyle.Short);
 
