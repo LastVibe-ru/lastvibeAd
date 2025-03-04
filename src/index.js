@@ -25,6 +25,21 @@ client.on(Events.MessageCreate, async message => {
         await message.channel.send({ embeds: [embed], components: [row] });
     }
 
+    if (message.content === '!botQue'){
+        const buttonQue = new ButtonBuilder()
+            .setCustomId('openModalQue')
+            .setLabel('Предложить')
+            .setStyle(ButtonStyle.Primary);
+
+        const row = new ActionRowBuilder().addComponents(buttonQue);
+
+        const embedQue = new EmbedBuilder()
+            .setTitle('📩 Предложить идею')
+            .setDescription('По кнопке ниже вы можете предложить идею для развития сервера, а другие игроки проголосовать. \nИдеи понравившиеся нам или набравшие много положительных реакций будут добавлены. \n\nПишите обдуманно и не слишком размыто.');
+
+        await message.channel.send({ embeds: [embedQue], components: [row] });
+    }
+
     if (message.content === '!botInfo') {
         const btnAds = new ButtonBuilder()
             .setCustomId('addRoleAds')
@@ -85,6 +100,24 @@ client.on(Events.InteractionCreate, async interaction => {
             await interaction.showModal(modal);
         }
 
+        if (interaction.customId === 'openModalQue'){
+            const modal = new ModalBuilder()
+                .setCustomId('modalQue')
+                .setTitle('Предложение идеи');
+
+            const titleInput = new TextInputBuilder()
+                .setCustomId('idea')
+                .setLabel('Опишите вашу идею')
+                .setStyle(TextInputStyle.Paragraph)
+                .setPlaceholder('Я думаю на сервере бы хорошо смотрелось...');
+
+            const row = new ActionRowBuilder().addComponents(titleInput);
+
+            modal.addComponents(row);
+
+            await interaction.showModal(modal);
+        }
+
         if (interaction.isModalSubmit() && interaction.customId === 'adModal') {
             const title = interaction.fields.getTextInputValue('title');
             const description = interaction.fields.getTextInputValue('description');
@@ -115,12 +148,32 @@ client.on(Events.InteractionCreate, async interaction => {
             }
         }
 
+        if (interaction.isModalSubmit() && interaction.customId === 'modalQue'){
+            const idea = interaction.fields.getTextInputValue('idea');
+
+            const queChannel = client.channels.cache.get('1346500034123923507');
+            if (!queChannel){
+                return interaction.reply({ content: 'Упс, ошибка. Скоро починим', ephemeral: true });
+            }
+
+            const embed = new EmbedBuilder()
+                .setTitle(`Идея от ${interaction.user.displayName}`)
+                .setDescription(idea)
+                .setFooter({ text: 'Оцените идею реакцией 👍 или 👎' });
+
+            const msg = await queChannel.send({ embeds: [embed] });
+            await msg.react('👍');
+            await msg.react('👎');
+
+            await interaction.reply({ content: 'Ваша идея была успешно отправлена!', ephemeral: true });
+        }
+
         if (interaction.customId === 'addRoleAds') {
             const member = interaction.member; // Используем interaction.member напрямую
-            const role = interaction.guild.roles.cache.find(r => r.name === 'advertisements');
+            const role = interaction.guild.roles.cache.find(r => r.name === 'Advertisements');
 
-            if (role) { // Проверяем, существует ли роль
-                if (member.roles.cache.has(role.id)) { // Используем role.id
+            if (role) {
+                if (member.roles.cache.has(role.id)) {
                     await member.roles.remove(role).catch(console.error);
                     await interaction.reply({ content: 'Роль убрана', ephemeral: true });
                 } else {
@@ -134,7 +187,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
         if (interaction.customId === 'addRoleEvents') {
             const member = interaction.member;
-            const role = interaction.guild.roles.cache.find(r => r.name === 'events');
+            const role = interaction.guild.roles.cache.find(r => r.name === 'Events');
 
             if (role) {
                 if (member.roles.cache.has(role.id)) {
@@ -151,7 +204,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
         if (interaction.customId === 'addRoleContent') {
             const member = interaction.member;
-            const role = interaction.guild.roles.cache.find(r => r.name === 'contents');
+            const role = interaction.guild.roles.cache.find(r => r.name === 'Contents');
 
             if (role) {
                 if (member.roles.cache.has(role.id)) {
