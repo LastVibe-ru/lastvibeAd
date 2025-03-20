@@ -1,12 +1,44 @@
-const { Client, GatewayIntentBits, Events, ActionRowBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
+const { Client, GatewayIntentBits, Events, ActionRowBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle,
+    Embed
+} = require('discord.js');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+
+const express = require('express');
+const app = express();
+const port = 8091;
 
 const TOKEN = 'MTM0NjA4ODIyMTEyOTQ0NTQ1Nw.GwqQmv.HeEgjsQAiT1fXrObIndC_SvYJ26RPpdW9OiY9E';
 
 client.once(Events.ClientReady, () => {
     console.log(`Logged in as ${client.user.tag}!`);
+
+    startServer();
 });
+
+function startServer(){
+    app.get('/ban', async (req, res) => {
+        const { name, reason } = req.query;
+
+        if (!name || !reason){
+            res.status(400).send("Bad gateway");
+
+            return;
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle(`Игрок ${name} забанен`)
+            .setDescription(`Причина: ${reason}`);
+
+        const banChanal = client.channels.cache.get('1352167956787761224');
+
+        await banChanal.send({ embeds: [embed] });
+    });
+
+    app.listen(port, () => {
+        console.log(`Server started at ${port}`);
+    });
+}
 
 client.on(Events.MessageCreate, async message => {
     if (message.content === '!botCreate') {

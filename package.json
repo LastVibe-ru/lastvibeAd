@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@discordjs/rest": "^2.4.3",
-    "discord-api-types": "^0.37.119"
+    "discord-api-types": "^0.37.119",
+    "express": "^4.21.2"
   }
 }
