@@ -1,3 +1,6 @@
+// This code is not ideal
+// Please send issue - https://github.com/LastVibe-ru/lastvibeAd/issues
+
 const { Client, GatewayIntentBits, Events, ActionRowBuilder, EmbedBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputBuilder, TextInputStyle,
     Embed
 } = require('discord.js');
@@ -13,7 +16,10 @@ const port = 8091;
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 
-const TOKEN = 'MTM0NjA4ODIyMTEyOTQ0NTQ1Nw.GwqQmv.HeEgjsQAiT1fXrObIndC_SvYJ26RPpdW9OiY9E';
+// Don't try using api in commit hystory
+// We create new api >_<
+
+const TOKEN = config.api_key;
 
 client.once(Events.ClientReady, () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -41,7 +47,7 @@ function startServer(){
             .setTitle(`Игрок ${name} забанен`)
             .setDescription(`Причина: ${reason}`);
 
-        const banChanal = client.channels.cache.get('1352167956787761224');
+        const banChanal = client.channels.cache.get(config.ban_channel);
 
         await banChanal.send({ embeds: [embed] });
         
@@ -65,7 +71,7 @@ function startServer(){
         const embed = new EmbedBuilder()
             .setTitle(`Игрок ${name} разбанен`)
 
-        const banChanal = client.channels.cache.get('1352167956787761224');
+        const banChanal = client.channels.cache.get(config.ban_channel);
 
         await banChanal.send({ embeds: [embed] });
     });
@@ -190,7 +196,7 @@ client.on(Events.InteractionCreate, async interaction => {
             const description = interaction.fields.getTextInputValue('description');
             const url = interaction.fields.getTextInputValue('url');
 
-            const adChannel = client.channels.cache.get('1346096725466546199');
+            const adChannel = client.channels.cache.get(config.ad_channel);
             if (!adChannel) {
                 return interaction.reply({ content: 'Канал не найден.', ephemeral: true });
             }
@@ -218,7 +224,7 @@ client.on(Events.InteractionCreate, async interaction => {
         if (interaction.isModalSubmit() && interaction.customId === 'modalQue'){
             const idea = interaction.fields.getTextInputValue('idea');
 
-            const queChannel = client.channels.cache.get('1346500034123923507');
+            const queChannel = client.channels.cache.get(config.que_channel);
             if (!queChannel){
                 return interaction.reply({ content: 'Упс, ошибка. Скоро починим', ephemeral: true });
             }
@@ -236,7 +242,7 @@ client.on(Events.InteractionCreate, async interaction => {
         }
 
         if (interaction.customId === 'addRoleAds') {
-            const member = interaction.member; // Используем interaction.member напрямую
+            const member = interaction.member;
             const role = interaction.guild.roles.cache.find(r => r.name === 'Advertisements');
 
             if (role) {
