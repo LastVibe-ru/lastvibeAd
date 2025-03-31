@@ -7,11 +7,11 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBit
 const fs = require('fs');
 
 const express = require('express');
-const { json } = require('stream/consumers');
+
 const app = express();
 const port = 8091;
 
-const config = JSON.parse(fs.readFileSync('../config.json', 'utf-8'));
+const config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 
 const TOKEN = 'MTM0NjA4ODIyMTEyOTQ0NTQ1Nw.GwqQmv.HeEgjsQAiT1fXrObIndC_SvYJ26RPpdW9OiY9E';
 
@@ -23,15 +23,15 @@ client.once(Events.ClientReady, () => {
 
 function startServer(){
     app.get('/ban', async (req, res) => {
-        const { name, reason, api } = req.query;
+        const { name, reason, key } = req.query;
         
-        if (!name || !reason || !api){
+        if (!name || !reason || !key){
             res.status(400).send("Bad gateway");
 
             return;
         }
 
-        if (api != config.api_key){
+        if (key != config.api_key){
             res.status(400).send("Unauthorized");
 
             return;
@@ -48,15 +48,15 @@ function startServer(){
     });
 
     app.get('/unban', async (req, res) => {
-        const {name, api} = req.query;
+        const {name, key} = req.query;
 
-        if (!name || !api){
+        if (!name || !key){
             res.status(400).send("Bad gateway");
 
             return;
         }
 
-        if (api != config.api_key){
+        if (key != config.api_key){
             res.status(400).send("Unauthorized")
 
             return;
