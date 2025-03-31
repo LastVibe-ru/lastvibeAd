@@ -4,9 +4,14 @@ const { Client, GatewayIntentBits, Events, ActionRowBuilder, EmbedBuilder, Butto
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
 
+const fs = require('fs');
+
 const express = require('express');
+const { json } = require('stream/consumers');
 const app = express();
 const port = 8091;
+
+const config = JSON.parse(fs.readFileSync('../config.json', 'utf-8'));
 
 const TOKEN = 'MTM0NjA4ODIyMTEyOTQ0NTQ1Nw.GwqQmv.HeEgjsQAiT1fXrObIndC_SvYJ26RPpdW9OiY9E';
 
@@ -18,10 +23,16 @@ client.once(Events.ClientReady, () => {
 
 function startServer(){
     app.get('/ban', async (req, res) => {
-        const { name, reason } = req.query;
-
-        if (!name || !reason){
+        const { name, reason, api } = req.query;
+        
+        if (!name || !reason || !api){
             res.status(400).send("Bad gateway");
+
+            return;
+        }
+
+        if (api != config.api_key){
+            res.status(400).send("Unauthorized");
 
             return;
         }
@@ -29,6 +40,30 @@ function startServer(){
         const embed = new EmbedBuilder()
             .setTitle(`Игрок ${name} забанен`)
             .setDescription(`Причина: ${reason}`);
+
+        const banChanal = client.channels.cache.get('1352167956787761224');
+
+        await banChanal.send({ embeds: [embed] });
+        
+    });
+
+    app.get('/unban', async (req, res) => {
+        const {name, api} = req.query;
+
+        if (!name || !api){
+            res.status(400).send("Bad gateway");
+
+            return;
+        }
+
+        if (api != config.api_key){
+            res.status(400).send("Unauthorized")
+
+            return;
+        }
+
+        const embed = new EmbedBuilder()
+            .setTitle(`Игрок ${name} разбанен`)
 
         const banChanal = client.channels.cache.get('1352167956787761224');
 
