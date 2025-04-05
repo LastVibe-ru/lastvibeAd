@@ -16,10 +16,10 @@ const port = 8091;
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 
-// Don't try using api in commit hystory
+// Don't try using api key in commit hystory
 // We create new api >_<
 
-const TOKEN = config.api_key;
+const TOKEN = config.discord_key;
 
 client.once(Events.ClientReady, () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -27,17 +27,17 @@ client.once(Events.ClientReady, () => {
     startServer();
 });
 
-function startServer(){
+function startServer() {
     app.get('/ban', async (req, res) => {
         const { name, reason, key } = req.query;
-        
-        if (!name || !reason || !key){
+
+        if (!name || !reason || !key) {
             res.status(400).send("Bad gateway");
 
             return;
         }
 
-        if (key != config.api_key){
+        if (key != config.api_key) {
             res.status(400).send("Unauthorized");
 
             return;
@@ -50,19 +50,19 @@ function startServer(){
         const banChanal = client.channels.cache.get(config.ban_channel);
 
         await banChanal.send({ embeds: [embed] });
-        
+
     });
 
     app.get('/unban', async (req, res) => {
-        const {name, key} = req.query;
+        const { name, key } = req.query;
 
-        if (!name || !key){
+        if (!name || !key) {
             res.status(400).send("Bad gateway");
 
             return;
         }
 
-        if (key != config.api_key){
+        if (key != config.api_key) {
             res.status(400).send("Unauthorized")
 
             return;
@@ -98,7 +98,7 @@ client.on(Events.MessageCreate, async message => {
         await message.channel.send({ embeds: [embed], components: [row] });
     }
 
-    if (message.content === '!botQue'){
+    if (message.content === '!botQue') {
         const buttonQue = new ButtonBuilder()
             .setCustomId('openModalQue')
             .setLabel('Предложить')
@@ -173,7 +173,7 @@ client.on(Events.InteractionCreate, async interaction => {
             await interaction.showModal(modal);
         }
 
-        if (interaction.customId === 'openModalQue'){
+        if (interaction.customId === 'openModalQue') {
             const modal = new ModalBuilder()
                 .setCustomId('modalQue')
                 .setTitle('Предложение идеи');
@@ -201,7 +201,7 @@ client.on(Events.InteractionCreate, async interaction => {
                 return interaction.reply({ content: 'Канал не найден.', ephemeral: true });
             }
 
-            if (url && url.trim() !== ''){
+            if (url && url.trim() !== '') {
                 const embed = new EmbedBuilder()
                     .setAuthor({ name: interaction.user.displayName })
                     .setTitle(title)
@@ -221,11 +221,11 @@ client.on(Events.InteractionCreate, async interaction => {
             }
         }
 
-        if (interaction.isModalSubmit() && interaction.customId === 'modalQue'){
+        if (interaction.isModalSubmit() && interaction.customId === 'modalQue') {
             const idea = interaction.fields.getTextInputValue('idea');
 
             const queChannel = client.channels.cache.get(config.que_channel);
-            if (!queChannel){
+            if (!queChannel) {
                 return interaction.reply({ content: 'Упс, ошибка. Скоро починим', ephemeral: true });
             }
 
@@ -282,13 +282,13 @@ client.on(Events.InteractionCreate, async interaction => {
             if (role) {
                 if (member.roles.cache.has(role.id)) {
                     await member.roles.remove(role).catch(console.error);
-                    await interaction.reply({content: 'Роль убрана', ephemeral: true});
+                    await interaction.reply({ content: 'Роль убрана', ephemeral: true });
                 } else {
                     await member.roles.add(role).catch(console.error);
-                    await interaction.reply({content: 'Роль выдана', ephemeral: true});
+                    await interaction.reply({ content: 'Роль выдана', ephemeral: true });
                 }
             } else {
-                await interaction.reply({content: 'Ошибка, попробуйте позднее', ephemeral: true});
+                await interaction.reply({ content: 'Ошибка, попробуйте позднее', ephemeral: true });
             }
         }
     } catch (error) {
