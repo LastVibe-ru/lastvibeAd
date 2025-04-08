@@ -122,7 +122,7 @@ client.on(Events.MessageCreate, async message => {
         const row = new ActionRowBuilder().addComponents(btnRep);
 
         const embedRep = new EmbedBuilder()
-            .setTitle('🐞Нашли баг?')
+            .setTitle('🐞 Нашли баг?')
             .setDescription('Нашли баг в плагине дискорде или сайте сервера? Сообщайте починим и дадим вознаграждение (в зависимости от критичности бага).');
 
         await message.channel.send({ embeds: [embedRep], components: [row] });
