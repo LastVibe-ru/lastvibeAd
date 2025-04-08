@@ -272,6 +272,7 @@ client.on(Events.InteractionCreate, async interaction => {
 
             const msg = `Ошибка от ${interaction.user.displayName}\nТема: ${title}\nОписание: ${desc}`;
 
+            await interaction.reply({ content: "Баг успешно отправлен" });
             await channel.send({ content: msg });
         }
 
