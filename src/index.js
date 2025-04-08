@@ -116,7 +116,7 @@ client.on(Events.MessageCreate, async message => {
     if (message.content === '!botBug') {
         const btnRep = new ButtonBuilder()
             .setCustomId('addBugRep')
-            .setLabel('🐞Сообщить')
+            .setLabel('Сообщить')
             .setStyle(ButtonStyle.Primary);
 
         const row = new ActionRowBuilder().addComponents(btnRep);
