@@ -16,7 +16,7 @@ const port = 8091;
 
 const config = JSON.parse(fs.readFileSync('config.json', 'utf-8'));
 
-// Don't try using api key in commit hystory
+// Don't try using api key in commit history
 // We create new api >_<
 
 const TOKEN = config.discord_key;
@@ -113,6 +113,21 @@ client.on(Events.MessageCreate, async message => {
         await message.channel.send({ embeds: [embedQue], components: [row] });
     }
 
+    if (message.content === '!botBug') {
+        const btnRep = new ButtonBuilder()
+            .setCustomId('addBugRep')
+            .setLabel('🐞Сообщить')
+            .setStyle(ButtonStyle.Primary);
+
+        const row = new ActionRowBuilder().addComponents(btnRep);
+
+        const embedRep = new EmbedBuilder()
+            .setTitle('🐞Нашли баг?')
+            .setDescription('Нашли баг в плагине дискорде или сайте сервера? Сообщайте починим и дадим вознаграждение (в зависимости от критичности бага).');
+
+        await message.channel.send({ embeds: [embedRep], components: [row] });
+    }
+
     if (message.content === '!botInfo') {
         const btnAds = new ButtonBuilder()
             .setCustomId('addRoleAds')
@@ -173,6 +188,31 @@ client.on(Events.InteractionCreate, async interaction => {
             await interaction.showModal(modal);
         }
 
+        if (interaction.customId === 'addBugRep'){
+            const modal = new ModalBuilder()
+                .setCustomId('repBug')
+                .setTitle('Репорт бага');
+
+            const titleInput = new TextInputBuilder()
+                .setCustomId('repTitle')
+                .setPlaceholder('Ошибка в...')
+                .setLabel('Заголовок')
+                .setStyle(TextInputStyle.Short);
+
+            const descriptionInput = new TextInputBuilder()
+                .setCustomId('repDesc')
+                .setPlaceholder('Если я делаю ... происходит ...')
+                .setLabel('Подробное описание ошибки')
+                .setStyle(TextInputStyle.Paragraph);
+
+            const titleRow = new ActionRowBuilder().addComponents(titleInput);
+            const descRow = new ActionRowBuilder().addComponents(descriptionInput);
+
+            modal.addComponents(titleRow, descRow);
+
+            await interaction.showModal(modal);
+        }
+
         if (interaction.customId === 'openModalQue') {
             const modal = new ModalBuilder()
                 .setCustomId('modalQue')
@@ -219,6 +259,20 @@ client.on(Events.InteractionCreate, async interaction => {
                 await adChannel.send({ embeds: [embed] });
                 await interaction.reply({ content: 'Ваше объявление было успешно отправлено!', ephemeral: true });
             }
+        }
+
+        if (interaction.isModalSubmit() && interaction.customId === 'repBug'){
+            const title = interaction.fields.getTextInputValue('repTitle');
+            const desc = interaction.fields.getTextInputValue('repDesc');
+
+            const channel = client.channels.cache.get(config.bug_channel);
+            if (!channel){
+                return interaction.reply({ content: 'Канал не найден.', ephemeral: true });
+            }
+
+            const msg = `Ошибка от ${interaction.user.displayName}\nТема: ${title}\nОписание: ${desc}`;
+
+            await channel.send({ content: msg });
         }
 
         if (interaction.isModalSubmit() && interaction.customId === 'modalQue') {

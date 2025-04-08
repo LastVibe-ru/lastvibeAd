@@ -2,6 +2,7 @@
     "api_key": "YOU_KEY",
     "discord_key": "YOU_KEY",
     "ban_channel": "YOU_ID",
-    "ad_channal": "YOU_ID",
-    "que_channel": "YOU_ID"
+    "ad_channel": "YOU_ID",
+    "que_channel": "YOU_ID",
+    "bug_channel": "YOU_ID"
 }
